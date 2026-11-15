@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#6366f1" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f172a"  media="(prefers-color-scheme: dark)">
+  <meta name="description" content="A beautiful, modern To-Do app — manage your tasks with ease.">
+  <title>✅ To-Do App</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- =================== HEADER =================== -->
+<header class="app-header">
+  <div class="app-wrapper">
+    <div class="header-top">
+      <h1 class="app-title">
+        <span class="app-title-icon">✅</span>
+        My Tasks
+      </h1>
+      <div class="header-actions">
+        <button class="icon-btn" id="exportBtn" title="Export tasks">📤</button>
+        <label class="icon-btn" title="Import tasks" style="cursor:pointer;">
+          📥
+          <input type="file" id="importInput" accept=".json" style="display:none;">
+        </label>
+        <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
+      </div>
+    </div>
+    <p class="header-date" id="headerDate"></p>
+    <div class="progress-section" style="margin-top:10px;">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <span class="progress-label" id="progressLabel">0%</span>
+    </div>
+  </div>
+</header>
+
+<!-- =================== MAIN =================== -->
+<main class="app-wrapper" style="padding-top:24px;">
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-number" id="statTotal">0</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number warning" id="statLeft">0</span>
+      <span class="stat-label">Active</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number success" id="statDone">0</span>
+      <span class="stat-label">Done</span>
+    </div>
+  </div>
+
+  <!-- Add Task -->
+  <div class="add-task-card">
+    <div class="task-input-row">
+      <input
+        type="text"
+        id="taskInput"
+        class="task-title-input"
+        placeholder="Add a new task…"
+        autocomplete="off"
+        spellcheck="false"
+        maxlength="200"
+      >
+      <button id="addBtn" class="add-btn" aria-label="Add task">+</button>
+    </div>
+    <div class="task-meta-row">
+      <select id="categorySelect" class="meta-select" aria-label="Category">
+        <option value="Personal">📁 Personal</option>
+        <option value="Work">💼 Work</option>
+        <option value="Study">📚 Study</option>
+        <option value="Shopping">🛒 Shopping</option>
+        <option value="Health">💪 Health</option>
+        <option value="Other">📌 Other</option>
+      </select>
+      <select id="prioritySelect" class="meta-select" aria-label="Priority">
+        <option value="medium">🟡 Medium</option>
+        <option value="low">🟢 Low</option>
+        <option value="high">🔴 High</option>
+      </select>
+      <input type="date" id="dueDateInput" class="meta-date" aria-label="Due date">
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input
+      type="search"
+      id="searchInput"
+      class="search-input"
+      placeholder="Search tasks…"
+      autocomplete="off"
+    >
+    <button id="searchClear" class="search-clear" aria-label="Clear search">✕</button>
+  </div>
+
+  <!-- Status Tabs -->
+  <div class="tabs-row">
+    <button id="tabAll" class="tab-btn active">
+      All <span id="tabAllCount" class="tab-badge">0</span>
+    </button>
+    <button id="tabActive" class="tab-btn">
+      Active <span id="tabActiveCount" class="tab-badge">0</span>
+    </button>
+    <button id="tabCompleted" class="tab-btn">
+      Done <span id="tabCompletedCount" class="tab-badge">0</span>
+    </button>
+  </div>
+
+  <!-- Category Chips -->
+  <div class="filters-row">
+    <button class="filter-chip" data-category="Personal">📁 Personal</button>
+    <button class="filter-chip" data-category="Work">💼 Work</button>
+    <button class="filter-chip" data-category="Study">📚 Study</button>
+    <button class="filter-chip" data-category="Shopping">🛒 Shopping</button>
+    <button class="filter-chip" data-category="Health">💪 Health</button>
+    <button class="filter-chip" data-category="Other">📌 Other</button>
+  </div>
+
+  <!-- Priority Chips + Sort -->
+  <div class="sort-row">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="filter-chip priority-high"   data-priority="high">🔴 High</button>
+      <button class="filter-chip priority-medium" data-priority="medium">🟡 Med</button>
+      <button class="filter-chip priority-low"    data-priority="low">🟢 Low</button>
+    </div>
+    <select id="sortSelect" class="sort-select" aria-label="Sort by">
+      <option value="created_desc">↕ Newest</option>
+      <option value="created_asc">↕ Oldest</option>
+      <option value="priority">↕ Priority</option>
+      <option value="due">↕ Due date</option>
+      <option value="alpha">↕ A–Z</option>
+    </select>
+  </div>
+
+  <!-- Task List -->
+  <div id="taskList" class="task-list"></div>
+
+  <!-- Empty State -->
+  <div id="emptyState" class="empty-state">
+    <span class="empty-icon">📭</span>
+    <h2 class="empty-title">No tasks here</h2>
+    <p class="empty-desc">Add your first task above<br>or change your filter settings.</p>
+  </div>
+
+</main>
+
+<!-- =================== BULK BAR =================== -->
+<div id="bulkBar" class="bulk-bar">
+  <span id="bulkCount"></span>
+  <button id="clearCompletedBtn" class="bulk-bar-btn danger">Clear completed</button>
+</div>
+
+<!-- =================== CONFIRM MODAL =================== -->
+<div id="confirmModal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h2 class="modal-title" id="confirmTitle">Are you sure?</h2>
+    <div class="modal-body">
+      <p id="confirmMsg" style="color:var(--text-secondary);font-size:14px;"></p>
+    </div>
+    <div class="modal-footer">
+      <button id="confirmCancel" class="btn btn-secondary">Cancel</button>
+      <button id="confirmOk" class="btn btn-danger">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== TOAST =================== -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
